@@ -1,0 +1,20 @@
+# Python
+*.pyc
+package/
+__pycache__/
+
+# IDE
+.idea/
+
+# Local files
+*.env
+.env.*
+!.env.example
+secrets/
+
+.DS_Store
+Thumbs.db
+
+# venv
+my-env/
+venv/

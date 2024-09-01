@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: pbl6-flask
+    environment:
+      FLASK_ENV: "${FLASK_ENV}"
+      API_HEADER_NAME: "${API_HEADER_NAME}"
+      API_HEADER_VALUE: "${API_HEADER_VALUE}"
+    ports:
+      - "8081:5000"
+    volumes:
+      - .:/app
+    networks:
+      - pbl6-docker-network
+
+networks:
+  pbl6-docker-network:
+    name: pbl6-docker-network
+    driver: bridge
+    external: true
