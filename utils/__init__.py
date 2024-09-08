@@ -1,11 +1,10 @@
 import logging
 import sys
-
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-
 from utils.environment import Env
+import os
 
 app = None
 db = None
@@ -29,6 +28,24 @@ def get_instance() -> Flask:
 
     app, db = create_app()
     return app, db
+
+
+def get_path(
+    parent_dir: str,
+    file_name: str,
+    mkdir_dir: bool = True,
+    remove_file_if_exist: bool = False,
+) -> str:
+    parent_dir = f"{os.getcwd()}/{parent_dir}"
+    file_path = f"{parent_dir}/{file_name}" if file_name else parent_dir
+
+    if not os.path.exists(parent_dir) and mkdir_dir:
+        os.makedirs(parent_dir)
+
+    if os.path.exists(file_path) and remove_file_if_exist:
+        os.remove(file_path)
+
+    return file_path
 
 
 def setup_logger() -> logging.Logger:
