@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+README.md
+.git
+.gitignore
+.editorconfig
+.python-version
+.env.example
