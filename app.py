@@ -5,7 +5,7 @@ from utils.constants import Errors
 from blueprints.user import user_bp
 from flask import request
 
-app = get_instance()
+app, _ = get_instance()
 
 app.register_blueprint(user_bp)
 

@@ -9,6 +9,8 @@ class Errors(Enum):
     UNAUTHORIZED = "unauthorized"
     API_KEY_NOT_FOUND = "api_key_is_required"
     API_KEY_INVALID = "api_key_not_match"
+    INVALID_TOKEN = "invalid_token"
+    EXPIRED_TOKEN = "expired_token"
 
 
 def get_error_message(error: Errors):
@@ -45,4 +47,6 @@ error_messages = {
         "code": "ERR_API0102",
         "message": "You don't have permission to access this api!",
     },
+    Errors.INVALID_TOKEN: {"code": "ERR_TOK0101", "message": "Invalid token!"},
+    Errors.EXPIRED_TOKEN: {"code": "ERR_TOK0102", "message": "Expired token!"},
 }
