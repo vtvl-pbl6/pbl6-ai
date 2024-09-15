@@ -4,8 +4,7 @@ from jwt.exceptions import ExpiredSignatureError, DecodeError, InvalidTokenError
 from flask import request
 from entities.account import Account
 from utils import get_instance
-from utils.abstract_response import AppResponse
-from utils.constants import Errors
+from utils.abstract_response import AppResponse, Errors
 
 _, db = get_instance()
 public_key_path = "secrets/access_token_public_key.pem"
@@ -31,7 +30,6 @@ def token_required(f):
 
             # Query account from the database
             account = Account.query.filter_by(id=account_id).first()
-
             if account is None:
                 return AppResponse.error(Errors.UNAUTHORIZED, 401)
 

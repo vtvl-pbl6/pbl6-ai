@@ -4,6 +4,7 @@ cffi==1.17.0
 charset-normalizer==3.3.2
 click==8.1.7
 cryptography==43.0.0
+Faker==28.4.1
 Flask==3.0.3
 Flask-Cors==5.0.0
 Flask-SQLAlchemy==3.1.1
@@ -20,6 +21,7 @@ PyJWT==2.9.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
+PyYAML==6.0.2
 requests==2.32.3
 scipy==1.14.1
 six==1.16.0
