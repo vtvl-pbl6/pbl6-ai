@@ -1,11 +1,13 @@
+import os
 from itertools import groupby
 from operator import itemgetter
 from vncorenlp import VnCoreNLP
-import os
 import re
 import numpy as np
 import pandas as pd
 from typing import List, Tuple
+
+annotator = None
 
 
 def get_path(
@@ -26,34 +28,30 @@ def get_path(
     return file_path
 
 
-# Initialize annotator
-annotator = VnCoreNLP(
-    get_path("hate_speech_text_span_detection/vncorenlp", "VnCoreNLP-1.1.1.jar"),
-    annotators="wseg",
-    max_heap_size="-Xmx500m",
-)
+def norm_unicode(text: str) -> str:
+    replacements = {
+        "òa": "oà",
+        "óa": "oá",
+        "ỏa": "oả",
+        "õa": "oã",
+        "ọa": "oạ",
+        "òe": "oè",
+        "óe": "oé",
+        "ỏe": "oẻ",
+        "õe": "oẽ",
+        "ọe": "oẹ",
+        "ùy": "uỳ",
+        "úy": "uý",
+        "ủy": "uỷ",
+        "ũy": "uỹ",
+        "ụy": "uỵ",
+        "Ủy": "Uỷ",
+    }
 
+    for old, new in replacements.items():
+        text = text.replace(old, new)
 
-def norm_unicode(df: pd.DataFrame) -> pd.DataFrame:
-    col_name = "content"
-    for row_idx in range(len(df)):
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("òa", "oà")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("óa", "oá")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ỏa", "oả")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("õa", "oã")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ọa", "oạ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("òe", "oè")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("óe", "oé")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ỏe", "oẻ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("õe", "oẽ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ọe", "oẹ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ùy", "uỳ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("úy", "uý")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ủy", "uỷ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ũy", "uỹ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("ụy", "uỵ")
-        df.loc[row_idx, col_name] = df.loc[row_idx, col_name].replace("Ủy", "Uỷ")
-    return df
+    return text
 
 
 # Replace text with pattern by replacement and keep track of the position
@@ -86,7 +84,7 @@ def replace(
 
 # Preprocess text by collapsing duplicated punctuations
 # Ex: "Hello, world!!!" -> "Hello, world!"
-def preprocess(text: str, pos: List[int]) -> Tuple[str, List[int]]:
+def remove_duplicated_punctuations(text: str, pos: List[int]) -> Tuple[str, List[int]]:
     # collapse duplicated punctuations
     punc = ",. !?\"'"
     for c in punc:
@@ -112,6 +110,19 @@ def find_consecutive_ranges(numbers: List[int]) -> List[Tuple[int, int]]:
 # Ex: tokenize_word("Hay quá Mac _. Lê- Nin", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21])
 #     -> (['Hay', 'quá', 'Mac', '_', '.', 'Lê', '-', 'Nin'], [[0, 1, 2], [4, 5, 6], [8, 9, 10], [12], [13], [15, 16], [17], [19, 20, 21]])
 def tokenize_word(text: str, pos: List[int]) -> Tuple[List[str], List[List[int]]]:
+    global annotator
+    annotator = (
+        VnCoreNLP(
+            get_path(
+                "hate_speech_text_span_detection/vncorenlp", "VnCoreNLP-1.1.1.jar"
+            ),
+            annotators="wseg",
+            max_heap_size="-Xmx500m",
+        )
+        if annotator is None
+        else annotator
+    )
+
     annotator_text = annotator.tokenize(text)
     tokens = []
     for i in range(len(annotator_text)):
@@ -168,3 +179,10 @@ def annotate(
             elif alignment[i][0] > indices[-1]:
                 break
     return annotations["Tag"]
+
+
+def preprocess(text: str) -> Tuple[List[str], List[List[int]]]:
+    text = norm_unicode(text)
+    texts, pos = remove_duplicated_punctuations(text, [i for i in range(len(text))])
+    tokens, pos = tokenize_word(texts, pos)
+    return tokens, pos

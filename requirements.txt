@@ -21,6 +21,7 @@ gast==0.6.0
 google-pasta==0.2.0
 grpcio==1.66.1
 h5py==3.11.0
+huggingface-hub==0.24.7
 idna==3.8
 ipython==8.27.0
 itsdangerous==2.2.0
@@ -69,8 +70,10 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
 PyYAML==6.0.2
+regex==2024.9.11
 requests==2.32.3
 rich==13.8.0
+safetensors==0.4.5
 scipy==1.14.1
 setuptools==74.1.2
 six==1.16.0
@@ -81,8 +84,11 @@ tensorboard==2.17.1
 tensorboard-data-server==0.7.2
 tensorflow==2.17.0
 termcolor==2.4.0
+tokenizers==0.19.1
 torch==2.4.1
+tqdm==4.66.5
 traitlets==5.14.3
+transformers==4.44.2
 triton==3.0.0
 typing_extensions==4.12.2
 tzdata==2024.1

@@ -18,3 +18,7 @@ Thumbs.db
 # venv
 my-env/
 venv/
+
+# models
+*.h5
+*.pt

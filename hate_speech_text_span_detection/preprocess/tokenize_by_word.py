@@ -6,43 +6,27 @@ import numpy as np
 import pandas as pd
 from ast import literal_eval
 from IPython.core.interactiveshell import InteractiveShell
-from utils import (
+from preprocess_utils import (
     get_path,
     norm_unicode,
-    preprocess,
+    remove_duplicated_punctuations,
     find_consecutive_ranges,
     tokenize_word,
     annotate,
 )
 
-InteractiveShell.ast_node_interactivity = "all"
 
+def load_raw_data(path: str) -> pd.DataFrame:
+    raw_data = pd.read_csv(path)
+    raw_data["index_spans"] = raw_data["index_spans"].apply(literal_eval)
 
-# Pandas global settings
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
-pd.set_option("display.width", None)
-pd.set_option("display.max_colwidth", None)
-pd.options.display.max_rows
+    # normalize unicode
+    for row_idx in range(len(raw_data)):
+        raw_data.loc[row_idx, "content"] = norm_unicode(
+            raw_data.loc[row_idx, "content"]
+        )
 
-# Pandas load raw data
-raw_train, raw_dev, raw_test = None, None, None
-raw_data_dir = get_path("hate_speech_text_span_detection/data/raw", "")
-
-
-def load_raw_data():
-    global raw_train, raw_dev, raw_test
-    raw_train = pd.read_csv(f"{raw_data_dir}/train.csv")
-    raw_train["index_spans"] = raw_train["index_spans"].apply(literal_eval)
-    norm_unicode(raw_train)
-
-    raw_dev = pd.read_csv(f"{raw_data_dir}/dev.csv")
-    raw_dev["index_spans"] = raw_dev["index_spans"].apply(literal_eval)
-    norm_unicode(raw_dev)
-
-    raw_test = pd.read_csv(f"{raw_data_dir}/test.csv")
-    raw_test["index_spans"] = raw_test["index_spans"].apply(literal_eval)
-    norm_unicode(raw_test)
+    return raw_data
 
 
 def load_text_spans_from_raw_data(raw_data: pd.DataFrame) -> list:
@@ -74,7 +58,7 @@ def process_BIO_data(data: list) -> pd.DataFrame:
     for d in data:
         text = d["text"]
         pos = [i for i in range(len(text))]
-        text, pos = preprocess(text, pos)
+        text, pos = remove_duplicated_punctuations(text, pos)
         tokens, alignment = tokenize_word(text, pos)
         annotations = annotate(d["index_HOS_spans"], alignment, tokens)
         ls = [[tokens[i], annotations[i]] for i in range(len(tokens))]
@@ -96,24 +80,41 @@ def process_BIO_data(data: list) -> pd.DataFrame:
     return df_final
 
 
-def save_BIO_data():
-    save_path = get_path("hate_speech_text_span_detection/data/processed", "")
+def preprocess(data):
+    raw_data_path = get_path(
+        parent_dir="hate_speech_text_span_detection/data/raw", file_name=data
+    )
+    saved_data_path = get_path(
+        parent_dir="hate_speech_text_span_detection/data/processed",
+        file_name=data,
+        remove_file_if_exist=True,
+    )
 
-    BIO_train = process_BIO_data(load_text_spans_from_raw_data(raw_train))
-    BIO_dev = process_BIO_data(load_text_spans_from_raw_data(raw_dev))
-    BIO_test = process_BIO_data(load_text_spans_from_raw_data(raw_test))
+    raw_data = load_raw_data(raw_data_path)
+    raw_data_with_text_spans = load_text_spans_from_raw_data(raw_data)
 
-    BIO_train.reset_index(inplace=True)
-    BIO_dev.reset_index(inplace=True)
-    BIO_test.reset_index(inplace=True)
-
-    # Save to csv
-    BIO_train.to_csv(f"{save_path}/train.csv")
-    BIO_dev.to_csv(f"{save_path}/dev.csv")
-    BIO_test.to_csv(f"{save_path}/test.csv")
+    BIO_data = process_BIO_data(raw_data_with_text_spans)
+    BIO_data.reset_index(inplace=True)
+    BIO_data.to_csv(saved_data_path)
 
 
 if __name__ == "__main__":
-    load_raw_data()
-    save_BIO_data()
-    print("Preprocess data successfully!")
+    InteractiveShell.ast_node_interactivity = "all"
+
+    # Pandas global settings
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.width", None)
+    pd.set_option("display.max_colwidth", None)
+    pd.options.display.max_rows
+
+    print("Preprocessing train data...")
+    preprocess("train.csv")
+
+    print("Preprocessing dev data...")
+    preprocess("dev.csv")
+
+    print("Preprocessing test data...")
+    preprocess("test.csv")
+
+    print("Preprocessing data successfully!")

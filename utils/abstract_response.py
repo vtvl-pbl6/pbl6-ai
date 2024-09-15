@@ -1,5 +1,5 @@
 from flask import jsonify
-from utils import setup_logger
+from utils import get_path, setup_logger
 from enum import Enum
 import yaml
 
@@ -14,11 +14,12 @@ class Errors(Enum):
     API_KEY_INVALID = "api_key_not_match"
     INVALID_TOKEN = "invalid_token"
     EXPIRED_TOKEN = "expired_token"
+    TEXT_IS_REQUIRED = "text_is_required"
 
 
 def get_error_message(error: Errors):
     # load error.yml file
-    error_yml_file_path = "utils/resources/errors.yml"
+    error_yml_file_path = get_path("utils/resources", "errors.yml")
     data = {}
     with open(error_yml_file_path, "r") as file:
         data = yaml.safe_load(file)

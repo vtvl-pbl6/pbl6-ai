@@ -1,10 +1,13 @@
+import os
 import logging
 import sys
+import numpy as np
+import torch
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from typing import Union
 from utils.environment import Env
-import os
 
 app = None
 db = None
@@ -61,3 +64,14 @@ def setup_logger() -> logging.Logger:
     logger.setLevel(logging.INFO)
 
     return logger
+
+
+def tensor_to_numpy(tensor: Union[torch.Tensor, list, np.ndarray]) -> np.ndarray:
+    if torch.is_tensor(tensor):
+        if tensor.is_cuda:
+            tensor = tensor.cpu()
+        return tensor.numpy()
+    elif isinstance(tensor, list):
+        return np.array(tensor)
+    else:
+        return tensor
