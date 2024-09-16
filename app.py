@@ -1,13 +1,12 @@
 from utils import get_instance
 from utils.environment import Env
-from utils.abstract_response import AppResponse
-from utils.constants import Errors
-from blueprints.user import user_bp
+from utils.abstract_response import AppResponse, Errors
+from blueprints.seeder import seeder_bp
 from flask import request
 
-app = get_instance()
+app, _ = get_instance()
 
-app.register_blueprint(user_bp)
+app.register_blueprint(seeder_bp)
 
 
 @app.before_request

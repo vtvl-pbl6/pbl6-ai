@@ -1,0 +1,102 @@
+# Common
+internal_server_error:
+  code: ERR_SER0101
+  message: Internal server error!
+bad_request_error:
+  code: ERR_SER0102
+  message: Bad request error!
+page_not_found:
+  code: ERR_SER0103
+  message: Page was not found!
+forbidden:
+  code: ERR_AUTH0101
+  message: Access Denied! You don’t have permission to access!
+unauthorized:
+  code: ERR_AUTH0102
+  message: You do not have permission to access this data!
+required_body_in_request:
+  code: ERR_REQ0101
+  message: The request body is required!
+invalid_uuid:
+  code: ERR_REQ0102
+  message: Invalid UUID!
+invalid_enum:
+  code: ERR_REQ0103
+  message: Invalid enum!
+
+# Authentication
+api_key_is_required:
+  code: ERR_API0101
+  message: API key is required!
+api_key_not_match:
+  code: ERR_API0102
+  message: You don't have permission to access this api!
+invalid_token:
+  code: ERR_TOK0101
+  message: Invalid token!
+expired_token:
+  code: ERR_TOK0102
+  message: Expired token!
+revoked_token:
+  code: ERR_TOK0103
+  message: Revoked token!
+invalid_refresh_token:
+  code: ERR_TOK0201
+  message: Invalid refresh token!
+expired_refresh_token:
+  code: ERR_TOK0202
+  message: Expired refresh token!
+revoked_refresh_token:
+  code: ERR_TOK0203
+  message: Revoked refresh token!
+refresh_token_not_found:
+  code: ERR_TOK0204
+  message: Refresh token is not found!
+reset_password_code_invalid:
+  code: ERR_FOR0101
+  message: Reset password code is invalid!
+reset_password_code_expired:
+  code: ERR_FOR0102
+  message: Reset password code is expired!
+
+# Permission
+permission_not_found:
+  code: ERR_PER0102
+  message: Permission not found!
+permission_is_require:
+  code: ERR_PER0103
+  message: Permission is require!
+
+# Account
+account_not_found:
+  code: ERR_ACC0101
+  message: Account is not found!
+incorrect_email_or_password:
+  code: ERR_ACC0103
+  message: Incorrect email or password!
+login_failed:
+  code: ERR_ACC0104
+  message: Login failed!
+account_is_disabled:
+  code: ERR_ACC0105
+  message: Account is disabled!
+account_is_active:
+  code: ERR_ACC0106
+  message: Account is active!
+account_is_not_active:
+  code: ERR_ACC0107
+  message: Account is not active!
+account_id_is_required:
+  code: ERR_ACC0108
+  message: Account id is required!
+
+# File
+upload_file_failed:
+  code: ERR_FIL0101
+  message: Upload file failed!
+file_not_found:
+  code: ERR_FIL0102
+  message: File not found!
+delete_file_failed:
+  code: ERR_FIL0103
+  message: Delete file failed!
