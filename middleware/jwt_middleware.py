@@ -3,11 +3,11 @@ import jwt
 from jwt.exceptions import ExpiredSignatureError, DecodeError, InvalidTokenError
 from flask import request
 from entities.account import Account
-from utils import get_instance
+from utils import get_instance, get_path
 from utils.abstract_response import AppResponse, Errors
 
 _, db = get_instance()
-public_key_path = "secrets/access_token_public_key.pem"
+public_key_path = get_path("secrets", "access_token_public_key.pem")
 
 
 def token_required(f):

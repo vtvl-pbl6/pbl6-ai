@@ -19,7 +19,7 @@ seeder_bp = Blueprint("seeder", __name__, url_prefix="/api/v1/seeder")
 _, db = get_instance()
 
 
-@seeder_bp.route("/", methods=["POST"])
+@seeder_bp.route("", methods=["POST"])
 @token_required
 def seed(account: Account):
     if account.role != AccountRole.ADMIN:
@@ -29,21 +29,18 @@ def seed(account: Account):
     reset = body.get("reset", False)
     repeat_times = body.get("repeat_times", 1000)
 
-    try:
-        if reset:
-            Account.query.filter(
-                not_(Account.email.in_(["user@gmail.com", "admin@gmail.com"]))
-            ).delete(synchronize_session=False)
-            Follower.query.delete()
-            Thread.query.delete()
-            ThreadSharer.query.delete()
-            db.session.commit()
+    if reset:
+        Account.query.filter(
+            not_(Account.email.in_(["user@gmail.com", "admin@gmail.com"]))
+        ).delete(synchronize_session=False)
+        Follower.query.delete()
+        Thread.query.delete()
+        ThreadSharer.query.delete()
+        db.session.commit()
 
-        seed_account(repeat_times)
-        seed_follower(repeat_times)
-        seed_thread(repeat_times)
-    except Exception as e:
-        return AppResponse.server_error(e)
+    seed_account(repeat_times)
+    seed_follower(repeat_times)
+    seed_thread(repeat_times)
 
     return AppResponse.success_with_data(data="Database seeded successfully!")
 
