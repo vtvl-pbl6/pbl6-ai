@@ -71,19 +71,36 @@ def detection(text: str, threshold: float = 0.5) -> TextSpanDetectionResult:
     # Preprocess text and tokenize
     words, indexes = preprocess(text)
     dataloader = create_dataloader(tokenizer, 64, words)
-    result = np.array([])
+    prediction_results = np.array([])
+    prediction_with_threshold_results = np.array([])
     for texts in dataloader:
         input_ids = texts["input_ids"].squeeze(1).to(device)
         attention_mask = texts["attention_mask"].to(device)
         predictions = model.predict(input_ids, attention_mask, threshold)
-        result = np.append(result, predictions)
+        # Add predictions to results
+        prediction_results = np.append(
+            prediction_results,
+            [prediction for _, prediction in predictions],
+        )
+        prediction_with_threshold_results = np.append(
+            prediction_with_threshold_results,
+            [prediction_with_threshold for prediction_with_threshold, _ in predictions],
+        )
 
-    result = result.flatten()
+    prediction_results = prediction_results.flatten()
+    prediction_with_threshold_results = prediction_with_threshold_results.flatten()
 
     # Create span result
     span_result = []
     for i, (word, index) in enumerate(zip(words, indexes)):
-        if result[i] == 1:
-            span_result.append(SpanResult(word=word, start=index[0], end=index[-1]))
+        if prediction_with_threshold_results[i] == 1:
+            span_result.append(
+                SpanResult(
+                    word=word,
+                    start=index[0],
+                    end=index[-1],
+                    score=prediction_results[i],
+                )
+            )
 
     return TextSpanDetectionResult(text, span_result)

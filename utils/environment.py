@@ -9,6 +9,7 @@ class Env:
     FLASK_ENV = os.environ.get("FLASK_ENV", "development").lower()
     API_HEADER_NAME = os.environ.get("API_HEADER_NAME", "")
     API_HEADER_VALUE = os.environ.get("API_HEADER_VALUE", "")
+    MAIN_SERVER_KEY = os.environ.get("MAIN_SERVER_KEY", "")
 
     # Database
     DATABASE_HOST = (

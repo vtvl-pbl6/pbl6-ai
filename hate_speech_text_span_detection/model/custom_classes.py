@@ -2,9 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
-from typing import List, Tuple
-
-from utils import tensor_to_numpy
+from typing import List
 
 
 # Model for text span detection
@@ -36,23 +34,22 @@ class MultiTaskModel(nn.Module):
 
         return span_logits
 
-    def predict(self, input_ids, attention_mask, threshold: float) -> np.ndarray:
-        span_logits = self.forward(input_ids, attention_mask)
+    def predict(self, input_ids, attention_mask, threshold: float) -> np.ndarray[tuple]:
+        span_logits = self.forward(input_ids, attention_mask)  # Tensor
+        span_logits = (
+            span_logits.squeeze().cpu().detach().numpy()
+        )  # Convert tensor to numpy array
 
-        # Convert logits to binary labels
-        predictions = (
-            span_logits > threshold
-        ).float()  # (batch_size, sequence_length, 1)
+        span_logits = (
+            span_logits.reshape(1, 64) if len(span_logits.shape) == 1 else span_logits
+        )
 
-        # Aggregate the predictions across the sequence
-        aggregated_predictions = torch.mean(predictions, dim=1)  # (batch_size, 1)
+        span_logits = [max(e) for e in span_logits]
 
-        # If the average prediction is above the threshold, classify as HOS (1), otherwise NOT-HOS (0)
-        final_predictions = (
-            aggregated_predictions > threshold
-        ).long()  # Final binary prediction (batch_size, 1)
+        # Convert logits to binary labels (batch_size, 1)
+        predictions = [(1, e) if e > threshold else (0, e) for e in span_logits]
 
-        return tensor_to_numpy(final_predictions).flatten()
+        return predictions
 
 
 class PrepareData(Dataset):
@@ -82,19 +79,21 @@ class PrepareData(Dataset):
 
 
 class SpanResult:
-    def __init__(self, word: str, start: int, end: int):
+    def __init__(self, word: str, start: int, end: int, score: float = 0.0):
         self.word = word
         self.start = start
         self.end = end
+        self.score = score
 
     def __str__(self):
-        return f"Word: {self.word}, Start: {self.start}, End: {self.end}"
+        return f"Word: {self.word}, Start: {self.start}, End: {self.end}, Score: {self.score}"
 
     def to_dict(self) -> dict:
         return {
             "word": self.word,
             "start": self.start,
             "end": self.end,
+            "score": self.score,
         }
 
 
