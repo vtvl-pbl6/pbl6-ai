@@ -15,7 +15,7 @@ from hate_speech_text_span_detection.model.custom_classes import (
 
 model = None
 tokenizer = None
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 
 def get_tokenizer() -> AutoTokenizer:
@@ -40,8 +40,9 @@ def get_model(checkpoint_path: str = "epoch_final.pt") -> MultiTaskModel:
 
     # Load model
     model = MultiTaskModel(input_model)
-    model.load_state_dict(torch.load(checkpoint_path, weights_only=True))
-    model.to(device)
+    model.load_state_dict(
+        torch.load(checkpoint_path, weights_only=False, map_location=device)
+    )
     model.eval()
 
     return model
@@ -63,7 +64,7 @@ def detection(text: str, threshold: float = 0.5) -> TextSpanDetectionResult:
     # Get model and tokenizer
     model = get_model(
         checkpoint_path=get_path(
-            "hate_speech_text_span_detection/model/checkpoint", "epoch_final.pt"
+            "hate_speech_text_span_detection/model/checkpoint", "epoch_29.pt"
         )
     )
     tokenizer = get_tokenizer()

@@ -1,6 +1,8 @@
-#
-# PLEASE DOWNLOAD VNCoreNLP WITH AVALIABLE SCRIPT IN SCRIPTS FOLDER
-#
+# |-------------------------------------------------------------------------------------------|
+# | Description: This script is used to preprocess raw data into BIO format.                  |
+# | Note: It runs via the command line and operates independently of the Flask server.        |
+# | Prerequisite: Please download VNCoreNLP using the available script in the scripts folder. |
+# |-------------------------------------------------------------------------------------------|
 
 import numpy as np
 import pandas as pd
@@ -111,8 +113,8 @@ if __name__ == "__main__":
     print("Preprocessing train data...")
     preprocess("train.csv")
 
-    print("Preprocessing dev data...")
-    preprocess("dev.csv")
+    print("Preprocessing validation data...")
+    preprocess("validation.csv")
 
     print("Preprocessing test data...")
     preprocess("test.csv")

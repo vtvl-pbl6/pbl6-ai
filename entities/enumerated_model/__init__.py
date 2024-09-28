@@ -18,8 +18,8 @@ class AccountStatus(Enum):
 
 
 class ThreadStatus(Enum):
-    ACTIVE = "ACTIVE"
-    INACTIVE = "INACTIVE"
+    CREATING = "CREATING"
+    CREATE_DONE = "CREATE_DONE"
     PENDING = "PENDING"
 
 
