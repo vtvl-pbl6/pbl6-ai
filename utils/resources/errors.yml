@@ -100,3 +100,8 @@ file_not_found:
 delete_file_failed:
   code: ERR_FIL0103
   message: Delete file failed!
+
+# Hate speech text spans detection
+text_is_required:
+  code: ERR_HAT0101
+  message: Text is required!

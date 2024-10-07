@@ -59,7 +59,7 @@ class Thread(db.Model):
         reaction_num: int = 0,
         shared_num: int = 0,
         is_pin: bool = False,
-        status: ThreadStatus = ThreadStatus.ACTIVE,
+        status: ThreadStatus = ThreadStatus.CREATE_DONE,
         visibility: Visibility = Visibility.PUBLIC,
     ):
         self.author_id = author_id
