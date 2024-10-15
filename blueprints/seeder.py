@@ -4,14 +4,15 @@ from typing import Tuple
 from sqlalchemy import func, not_
 from entities.account import Account
 from entities.enumerated_model import AccountGender, AccountRole, AccountStatus
-from utils import get_instance, setup_logger
-from utils.abstract_response import AppResponse, Errors
-from middleware.jwt_middleware import token_required
-from flask import Blueprint, request
+from entities.thread_react_users import ThreadReactUser
 from entities.account import Account
 from entities.follower import Follower
 from entities.thread import Thread
 from entities.thread_sharer import ThreadSharer
+from utils import get_instance, setup_logger
+from utils.abstract_response import AppResponse, Errors
+from middleware.jwt_middleware import token_required
+from flask import Blueprint, request
 from faker import Faker
 
 seeder_bp = Blueprint("seeder", __name__, url_prefix="/api/v1/seeder")
@@ -144,7 +145,7 @@ def seed_thread(repeat_times: int):
             thread = Thread(
                 author_id=account.id,
                 content=Faker().text(),
-                reaction_num=random.randint(0, 1000),
+                reaction_num=0,
                 shared_num=0,
                 is_pin=False,
             )
@@ -179,6 +180,37 @@ def seed_thread(repeat_times: int):
             )
             db.session.add(thread)
             final_threads.append(thread)
+
+        # ThreadReactUser
+        logger.info("Start seeding thread react user...")
+        thread_react_users = []
+        for _ in range(repeat_times):
+            account = (
+                Account.query.filter(Account.status != AccountStatus.INACTIVE)
+                .order_by(func.random())
+                .first()
+            )
+            thread = threads[random.randint(0, len(threads) - 1)]
+            thread_react_user = ThreadReactUser(thread_id=thread.id, user_id=account.id)
+            db.session.add(thread_react_user)
+            thread_react_users.append(thread_react_user)
+
+        # Update reaction_num in Thread
+        logger.info("Update reaction_num in thread...")
+        tmp = []
+        for thread in final_threads:
+            thread.reaction_num = len(
+                list(
+                    filter(
+                        lambda thread_react_user: thread_react_user.thread_id
+                        == thread.id,
+                        thread_react_users,
+                    )
+                )
+            )
+            db.session.add(thread)
+            tmp.append(thread)
+        final_threads = tmp
 
         # Comment
         logger.info("Start seeding comment...")
