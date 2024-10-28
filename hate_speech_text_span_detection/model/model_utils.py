@@ -12,6 +12,7 @@ from hate_speech_text_span_detection.model.custom_classes import (
     SpanResult,
     TextSpanDetectionResult,
 )
+from utils.environment import Env
 
 model = None
 tokenizer = None
@@ -64,7 +65,8 @@ def detection(text: str, threshold: float = 0.5) -> TextSpanDetectionResult:
     # Get model and tokenizer
     model = get_model(
         checkpoint_path=get_path(
-            "hate_speech_text_span_detection/model/checkpoint", "epoch_29.pt"
+            "hate_speech_text_span_detection/model/checkpoint",
+            Env.HATE_SPEECH_TEXT_MODEL_NAME,
         )
     )
     tokenizer = get_tokenizer()

@@ -105,3 +105,8 @@ delete_file_failed:
 text_is_required:
   code: ERR_HAT0101
   message: Text is required!
+
+# Nsfw image detection
+image_url_is_required:
+  code: ERR_NSF0101
+  message: Image URL is required!
