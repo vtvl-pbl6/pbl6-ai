@@ -15,6 +15,7 @@ class Errors(Enum):
     INVALID_TOKEN = "invalid_token"
     EXPIRED_TOKEN = "expired_token"
     TEXT_IS_REQUIRED = "text_is_required"
+    IMAGE_URL_IS_REQUIRED = "image_url_is_required"
 
 
 def get_error_message(error: Errors):

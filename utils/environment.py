@@ -13,7 +13,7 @@ class Env:
 
     # Database
     DATABASE_HOST = (
-        f"{os.environ.get("DATABASE_HOST", "")}:{os.environ.get("DATABASE_PORT", "")}"
+        f"{os.environ.get('DATABASE_HOST', '')}:{os.environ.get('DATABASE_PORT', '')}"
         if os.environ.get("DATABASE_PORT", "")
         else os.environ.get("DATABASE_HOST", "")
     )
@@ -21,3 +21,6 @@ class Env:
     DATABASE_USERNAME = os.environ.get("DATABASE_USERNAME", "")
     DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "")
     DATABASE_URI = f"postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}/{DATABASE_NAME}"  # postgresql://<username>:<password>@localhost/<database_name>
+
+    HATE_SPEECH_TEXT_MODEL_NAME = os.environ.get("HATE_SPEECH_TEXT_MODEL_NAME", "")
+    NSFW_IMAGE_MODEL_NAME = os.environ.get("NSFW_IMAGE_MODEL_NAME", "")

@@ -11,7 +11,7 @@ hate_speech_text_span_bp = Blueprint(
 
 
 @hate_speech_text_span_bp.route("", methods=["POST"])
-def seed():
+def moderate():
     body = request.get_json()
     text = body.get("text")
     key = body.get("key")
