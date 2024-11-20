@@ -5,27 +5,46 @@ from torch.utils.data import Dataset
 from typing import List
 
 
-# Model for text span detection
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=512):
+        super(PositionalEncoding, self).__init__()
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1).float()
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2).float()
+            * (-torch.log(torch.tensor(10000.0)) / d_model)
+        )
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe.unsqueeze(0))
+
+    def forward(self, x):
+        return x + self.pe[:, : x.size(1)]
+
+
 class MultiTaskModel(nn.Module):
     def __init__(self, input_model):
         super(MultiTaskModel, self).__init__()
         self.bert = input_model
-        self.span_classifier = nn.Linear(768, 1)  # Classification head
         self.dropout = nn.Dropout(0.1)
+        self.positional_encoding = PositionalEncoding(
+            d_model=self.bert.config.hidden_size
+        )
+        self.span_classifier = nn.Linear(self.bert.config.hidden_size, 1)
 
     def forward(self, input_ids, attention_mask):
-        # Forward pass through the BERT model
         output = self.bert(
             input_ids=input_ids, attention_mask=attention_mask, return_dict=False
         )
-        last_hidden_state = output[
-            0
-        ]  # Hidden state of shape (batch_size, sequence_length, hidden_size)
+        last_hidden_state = output[0]  # Shape: (batch_size, seq_length, hidden_size)
+
+        # Add positional encoding
+        last_hidden_state = self.positional_encoding(last_hidden_state)
 
         # Apply dropout
         last_hidden_state = self.dropout(last_hidden_state)
 
-        # Apply the span classifier to get logits for each token (batch_size, sequence_length, 1)
+        # Apply span classifier
         span_logits = self.span_classifier(last_hidden_state)
 
         span_logits = span_logits.permute(0, 2, 1)

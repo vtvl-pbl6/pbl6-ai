@@ -22,7 +22,9 @@ device = torch.device("cpu")
 def get_tokenizer() -> AutoTokenizer:
     global tokenizer
     tokenizer = (
-        AutoTokenizer.from_pretrained("xlm-roberta-base")
+        AutoTokenizer.from_pretrained(
+            "vinai/phobert-large", use_fast=False, strip_accents=False
+        )
         if tokenizer is None
         else tokenizer
     )
@@ -35,17 +37,16 @@ def get_model(checkpoint_path: str = "epoch_final.pt") -> MultiTaskModel:
         return model
 
     # Define input model
-    input_model = XLMRobertaModel.from_pretrained("xlm-roberta-base")
+    input_model = XLMRobertaModel.from_pretrained("vinai/phobert-base")
     tokenizer = get_tokenizer()
     input_model.resize_token_embeddings(len(tokenizer))
 
     # Load model
     model = MultiTaskModel(input_model)
     model.load_state_dict(
-        torch.load(checkpoint_path, weights_only=False, map_location=device)
+        torch.load(checkpoint_path, weights_only=False, map_location="cpu")
     )
     model.eval()
-
     return model
 
 
@@ -61,7 +62,7 @@ def create_dataloader(
     return dataloader
 
 
-def detection(text: str, threshold: float = 0.5) -> TextSpanDetectionResult:
+def detection(text: str, threshold: float = 0.7) -> TextSpanDetectionResult:
     # Get model and tokenizer
     model = get_model(
         checkpoint_path=get_path(
