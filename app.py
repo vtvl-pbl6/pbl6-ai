@@ -3,6 +3,7 @@ from utils.environment import Env
 from utils.abstract_response import AppResponse, Errors
 from blueprints.seeder import seeder_bp
 from blueprints.hate_speech_text_span import hate_speech_text_span_bp
+from blueprints.nsfw import nsfw_bp
 from flask import request
 
 app, _ = get_instance()
@@ -10,6 +11,7 @@ app, _ = get_instance()
 # Register blueprints
 app.register_blueprint(seeder_bp)
 app.register_blueprint(hate_speech_text_span_bp)
+app.register_blueprint(nsfw_bp)
 
 
 @app.before_request
